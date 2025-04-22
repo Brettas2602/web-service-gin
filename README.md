@@ -153,3 +153,8 @@ Quando você faz um `POST /products` com um JSON de produto:
 - Go 1.20 ou superior
 - PostgreSQL
 - Gin framework
+
+## Comandos úteis do terminal
+
+- Criar módulo de para gerenciamento de pacotes do projeto: `go mod init nome-da-pasta`
+- Importar driver do banco de dados postgres: `go get github.com/lib/pq`
