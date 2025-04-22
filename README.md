@@ -9,12 +9,6 @@ Este projeto é uma **API REST** escrita em **Go (Golang)** utilizando o framewo
 
 ---
 
-## 📚 O que é uma API?
-
-Uma **API** (Application Programming Interface) é um conjunto de regras que define como sistemas se comunicam. No caso desta aplicação, a API permite criar, buscar, atualizar e deletar produtos via requisições HTTP.
-
----
-
 ## 🧱 Arquitetura usada: MVC + UseCase
 
 O padrão utilizado é uma variação da arquitetura **MVC (Model-View-Controller)**, adaptada para aplicações em Go. Também incluímos a camada **UseCase**, que separa a lógica de negócio.
@@ -30,6 +24,36 @@ O padrão utilizado é uma variação da arquitetura **MVC (Model-View-Controlle
 
 ---
 
+## 🧩 Entendendo o padrão MVC
+
+O padrão **MVC** (Model-View-Controller) é uma forma de organizar o código da aplicação, separando responsabilidades para facilitar o entendimento, manutenção e escalabilidade.
+
+### 🔹 Model (modelo)
+- Representa os **dados da aplicação**.
+- Define a estrutura dos objetos que serão utilizados (ex: um `Product` com `ID`, `Name` e `Price`).
+- Pode incluir validações simples de estrutura.
+
+### 🔹 View (visão)
+- É a **interface com o usuário**.
+- Em APIs, essa camada não existe da mesma forma que em aplicações web com interface gráfica. A "view" aqui é a **resposta em JSON** enviada ao cliente.
+
+### 🔹 Controller (controlador)
+- É o **ponto de entrada** da requisição HTTP.
+- Recebe os dados da requisição, chama a lógica necessária (usecase) e retorna uma resposta.
+- Não deve conter regras de negócio nem comandos diretos ao banco de dados.
+
+### 🔹 UseCase (caso de uso)
+- É onde fica a **lógica de negócio** da aplicação.
+- Define o que deve acontecer quando, por exemplo, criamos ou atualizamos um produto.
+- Torna a aplicação mais modular e fácil de testar.
+
+### 🔹 Repository (repositório)
+- Faz a **comunicação com o banco de dados**.
+- Contém funções específicas para buscar, inserir, atualizar ou deletar dados (SQL).
+- Deve ser reutilizável e desacoplado da lógica de negócio.
+
+---
+
 ## 🧭 O que são **Receivers**?
 
 Em Go, uma **função com receiver** é como um "método" de uma struct. Exemplo:
@@ -38,20 +62,21 @@ Em Go, uma **função com receiver** é como um "método" de uma struct. Exemplo
 func (pc *ProductController) CreateProduct(c *gin.Context)
 ```
 
-Isso quer dizer que `CreateProduct` é um método da struct `ProductController`. É como em POO, só que explícito.
+Isso significa que `CreateProduct` é um método da struct `ProductController`. É similar ao que fazemos em orientação a objetos, mas com a sintaxe explícita de Go.
 
 ---
 
 ## 📌 O que são **ponteiros**?
 
-Ponteiros são formas de acessar e modificar diretamente o valor original de uma variável, ao invés de copiar seus dados.
+Ponteiros são formas de acessar e modificar diretamente o valor original de uma variável, em vez de fazer uma cópia.
 
 ```go
 func criarProduto(p *Product)
 ```
 
 - O `*Product` indica que estamos usando um **ponteiro**.
-- Isso economiza memória e permite modificar o valor original.
+- Isso economiza memória e permite alterar os dados originais.
+- Também permite retornar `nil` para indicar ausência de valor (útil em erros).
 
 ---
 
@@ -59,7 +84,7 @@ func criarProduto(p *Product)
 
 ### 🔸 `model/product.go`
 
-Define a estrutura básica do objeto que será manipulado na API.
+Define a estrutura básica do objeto que será manipulado na API:
 
 ```go
 type Product struct {
@@ -79,21 +104,21 @@ Responsável por receber as requisições HTTP, validar os dados e retornar as r
 func (pc *ProductController) CreateProduct(c *gin.Context)
 ```
 
-- **Receiver:** `(pc *ProductController)` é como "dizemos" que essa função pertence à struct `ProductController`.
+- **Receiver:** `(pc *ProductController)` indica que essa função pertence à struct `ProductController`.
 - **Parâmetro `*gin.Context`**: contém os dados da requisição HTTP e métodos para responder ao cliente.
 
 ---
 
 ### 🔸 `usecase/product_usecase.go`
 
-Aqui fica a **lógica de negócio**. Exemplo: se for necessário validar um preço, aplicar desconto, ou verificar se um produto já existe — tudo isso seria feito aqui.
+Aqui fica a **lógica de negócio**. Exemplo: se for necessário validar um preço, aplicar desconto ou verificar se um produto já existe — tudo isso seria feito aqui.
 
 ```go
 func (pu *ProductUsecase) CreateProduct(product *model.Product) (*model.Product, error)
 ```
 
 - Recebe um ponteiro de `Product`, o que evita cópias desnecessárias.
-- Retorna também um ponteiro, permitindo que possamos retornar `nil` em caso de erro.
+- Retorna também um ponteiro, permitindo retornar `nil` em caso de erro.
 
 ---
 
@@ -105,7 +130,7 @@ Faz o acesso ao **banco de dados**. Cada função aqui executa um comando SQL es
 func (pr *ProductRepository) CreateProduct(product *model.Product) (int, error)
 ```
 
-- Executa a `INSERT INTO` no banco.
+- Executa o `INSERT INTO` no banco.
 - Retorna o ID gerado para o produto.
 
 ---
