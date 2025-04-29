@@ -156,5 +156,5 @@ Quando você faz um `POST /products` com um JSON de produto:
 
 ## Comandos úteis do terminal
 
-- Criar módulo de para gerenciamento de pacotes do projeto: `go mod init nome-da-pasta`
+- Criar módulo para gerenciamento de pacotes do projeto: `go mod init nome-da-pasta`
 - Importar driver do banco de dados postgres: `go get github.com/lib/pq`
